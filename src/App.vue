@@ -12,12 +12,22 @@ const schema = yup.lazy(() =>
   }),
 )
 
-const { errors, defineField, meta } = useForm({
+const { errors, defineField, meta, handleSubmit, isSubmitting } = useForm({
   validationSchema: schema,
 })
 
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
+
+const onSubmit = handleSubmit((values, { resetForm }) => {
+  return new Promise<void>((resolve) =>
+    setTimeout(() => {
+      alert(JSON.stringify(values, null, 2))
+      resetForm()
+      resolve()
+    }, 2000),
+  )
+})
 </script>
 
 <template>
@@ -29,7 +39,10 @@ const [password, passwordAttrs] = defineField('password')
       Vee Validate <span class="text-xs text-white font-medium">with yup</span>
     </h1>
 
-    <div class="flex flex-col gap-6 w-full max-w-md mx-auto items-center justify-center">
+    <form
+      @submit="onSubmit"
+      class="flex flex-col gap-6 w-full max-w-md mx-auto items-center justify-center"
+    >
       <div class="flex flex-col gap-1 w-full">
         <label for="email" class="font-semibold"
           >Email <span class="text-red-500 text-xs">*</span></label
@@ -37,6 +50,7 @@ const [password, passwordAttrs] = defineField('password')
         <input
           v-model="email"
           v-bind="emailAttrs"
+          :disabled="meta.pending"
           class="bg-slate-900/40 text-white/90 border-[1.5px] ring-0 outline-0 focus:border-emerald-500 hover:bg-slate-900/60 border-slate-800 py-1 px-2 rounded-lg text-sm"
         />
         <p class="text-sm text-red-500">{{ errors.email }}</p>
@@ -50,23 +64,25 @@ const [password, passwordAttrs] = defineField('password')
             v-model="password"
             type="password"
             v-bind="passwordAttrs"
+            :disabled="meta.pending"
             class="bg-slate-900/40 text-white/90 flex-1 outline-0 focus:border-emerald-500 border-[1.5px] ring-0 outline-emerald-500 hover:bg-slate-900/60 border-slate-800 py-1 px-2 rounded-lg text-sm"
           />
           <input
             type="number"
             v-model.number="limit"
+            :disabled="meta.pending"
             class="bg-slate-900/40 text-white/90 ring-0 outline-0 focus:border-emerald-500 border-[1.5px] outline-emerald-500 hover:bg-slate-900/60 border-slate-800 py-1 px-2 rounded-lg text-sm"
           />
         </div>
         <p class="text-sm text-red-500">{{ errors.password }}</p>
       </div>
       <button
-        :disabled="!meta.dirty || !meta.valid"
+        :disabled="!meta.dirty || !meta.valid || isSubmitting"
         class="w-full bg-emerald-500 rounded-full disabled:bg-emerald-800 disabled:text-white/50 p-1"
       >
-        Submit
+        {{ !isSubmitting ? 'Submit' : 'Submitting...' }}
       </button>
-    </div>
+    </form>
     <div class="absolute size-72 blur-3xl top-44 bg-emerald-900 opacity-20 rounded-full" />
   </div>
 </template>
