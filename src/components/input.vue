@@ -9,25 +9,29 @@ const { label, name, type, placeholder } = defineProps<{
   placeholder?: string
 }>()
 
-const { value, errorMessage, meta } = useField(() => name, undefined, {
+const { value, errorMessage, meta, handleBlur, handleChange } = useField(() => name, undefined, {
   type: type ?? 'default',
 })
 </script>
 
 <template>
   <div class="flex w-full" :class="type ? 'flex-row gap-4' : 'flex-col gap-1'">
-    <label v-show="label" for="email" class="font-semibold"
+    <label v-if="label" :for="name" class="font-semibold"
       >{{ label }} <span v-show="meta.required" class="text-red-500 text-xs">*</span></label
     >
     <input
       :type="type ?? 'text'"
       :placeholder="placeholder"
+      :name
       v-model="value"
-      class="bg-slate-900/40 placeholder-gray-500 accent-emerald-500 text-white/90 border-[1.5px] ring-0 outline-0 border-slate-800 focus:brightness-110 focus:border-emerald-500 py-1 px-2 rounded-lg text-sm"
+      @blur="handleBlur"
+      @change="type == 'default' && handleChange"
+      class="placeholder-gray-500 accent-emerald-500 text-white/90 border-[1.5px] ring-0 outline-0 focus:brightness-110 py-1 px-2 rounded-lg text-sm"
       :class="{
-        'bg-red-950/30 border-red-500/70 focus:border-red-500/70': !meta.valid && meta.touched,
+        'bg-slate-900/40 border-slate-800 focus:border-emerald-500': !meta.touched || meta.valid,
+        'bg-red-950/30 border-red-500/70': meta.touched && errorMessage,
       }"
     />
-    <p :v-if="errorMessage && meta.touched" class="text-sm text-red-500">{{ errorMessage }}</p>
+    <p v-if="meta.touched && errorMessage" class="text-sm text-red-500">{{ errorMessage }}</p>
   </div>
 </template>

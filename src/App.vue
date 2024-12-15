@@ -2,26 +2,28 @@
 import { useForm } from 'vee-validate'
 import Input from './components/input.vue'
 import { toTypedSchema } from '@vee-validate/yup'
-import { boolean, object, string } from 'yup'
+import { array, boolean, object, string } from 'yup'
+import InputArray from './components/inputArray.vue'
 
 const schema = toTypedSchema(
   object({
     username: string().required(),
     email: string().required().email(),
     password: string().required().min(6),
-    student: boolean().required(),
+    student: boolean().required().default(false),
+    friends: array(string()),
   }),
 )
 
 const { handleSubmit, isSubmitting } = useForm({
   validationSchema: schema,
+  initialValues: { friends: ['Hoshang'] },
 })
 
-const onSubmit = handleSubmit((values, { resetForm }) => {
+const onSubmit = handleSubmit((values) => {
   return new Promise<void>((resolve) =>
     setTimeout(() => {
       alert(JSON.stringify(values, null, 2))
-      resetForm()
       resolve()
     }, 2000),
   )
@@ -33,7 +35,7 @@ const onSubmit = handleSubmit((values, { resetForm }) => {
     id="app"
     class="bg-slate-950 min-h-screen flex flex-col text-white items-center justify-center"
   >
-    <h1 class="text-4xl pb-12 text-emerald-500 font-extrabold tracking-tight">
+    <h1 class="text-4xl pb-12 text-emerald-500 z-10 font-extrabold tracking-tight">
       Vee Validate <span class="text-xs text-white font-medium">with yup</span>
     </h1>
     <form
@@ -43,6 +45,7 @@ const onSubmit = handleSubmit((values, { resetForm }) => {
       <Input name="username" label="Username" />
       <Input name="email" label="Email" />
       <Input name="password" label="Password" />
+      <InputArray name="friends" label="Friends" />
       <Input name="student" label="Student" type="checkbox" />
       <button
         :disabled="isSubmitting"
