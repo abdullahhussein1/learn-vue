@@ -1,26 +1,30 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script lang="ts" setup>
 import { useField, type InputType } from 'vee-validate'
+import type { InputTypeHTMLAttribute } from 'vue'
 
 const { label, name, type, placeholder } = defineProps<{
   label?: string
   name: string
-  type?: InputType
+  type?: InputTypeHTMLAttribute
   placeholder?: string
 }>()
 
 const { value, errorMessage, meta, handleBlur, handleChange } = useField(() => name, undefined, {
-  type: type ?? 'default',
+  type: type == 'radio' || type == 'checkbox' ? (type as InputType) : 'default',
 })
 </script>
 
 <template>
-  <div class="flex w-full" :class="type ? 'flex-row gap-4' : 'flex-col gap-1'">
+  <div
+    class="flex w-full"
+    :class="type == 'radio' || type == 'checkbox' ? 'flex-row gap-4' : 'flex-col gap-1'"
+  >
     <label v-if="label" :for="name" class="font-semibold"
       >{{ label }} <span v-show="meta.required" class="text-red-500 text-xs">*</span></label
     >
     <input
-      :type="type ?? 'text'"
+      :type="type"
       :placeholder="placeholder"
       :name
       v-model="value"

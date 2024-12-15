@@ -44,7 +44,7 @@ const onSubmit = handleSubmit((values) => {
     >
       <Input name="username" label="Username" />
       <Input name="email" label="Email" />
-      <Input name="password" label="Password" />
+      <Input name="password" type="password" label="Password" />
       <InputArray name="friends" label="Friends" />
       <Input name="student" label="Student" type="checkbox" />
       <button
